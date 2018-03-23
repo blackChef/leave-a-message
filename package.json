@@ -1,0 +1,14 @@
+{
+  "name": "leave-a-message",
+  "version": "0.1",
+  "description": "",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.5.2",
+    "fs-extra": "^3.0.1"
+  },
+  "author": "blackChef <hongpidai@gmail.com>"
+}
