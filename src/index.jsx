@@ -1,6 +1,6 @@
 import uniqueId from 'lodash/uniqueId';
 
-// A pub-sub pattern like event system,.
+// A pub-sub pattern like event system.
 // But instead of push msg to subscribers,
 // subscribers must manually pull msg from pub-sub center.
 
