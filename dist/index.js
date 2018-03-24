@@ -11,7 +11,7 @@ var _uniqueId2 = _interopRequireDefault(_uniqueId);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// A pub-sub pattern like event system,.
+// A pub-sub pattern like event system.
 // But instead of push msg to subscribers,
 // subscribers must manually pull msg from pub-sub center.
 
@@ -29,14 +29,16 @@ var publish = function publish(channelName, msg) {
   Object.keys(channels[channelName]).forEach(function (subscriber) {
     var saveHistory = Array.isArray(channels[channelName][subscriber]);
     if (saveHistory) {
-      channels[channelName][subscriber].push(msg);
+      channels[channelName][subscriber].unshift(msg);
     } else {
       channels[channelName][subscriber] = msg;
     }
   });
 };
 
-var subscribe = function subscribe(channelName, opts) {
+var subscribe = function subscribe(channelName) {
+  var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
   // If `saveHistory === false`, only the latest message would be kept,
   // otherwise, user can read an array of messages.
   var _opts$saveHistory = opts.saveHistory,
@@ -53,7 +55,7 @@ var subscribe = function subscribe(channelName, opts) {
 
   var readMsg = function readMsg() {
     if (!isSubscribed) {
-      throw new Error('leave-a-message: You have already unSubscribed the channel "' + channelName + '".');
+      throw new Error('leave-a-message: You have already unsubscribed the channel "' + channelName + '".');
     }
 
     var unreadMsg = channels[channelName][subscriberId];
@@ -61,12 +63,12 @@ var subscribe = function subscribe(channelName, opts) {
     return unreadMsg;
   };
 
-  var unSubscribe = function unSubscribe() {
+  var unsubscribe = function unsubscribe() {
     delete channels[channelName][subscriberId];
     isSubscribed = false;
   };
 
-  return { readMsg: readMsg, unSubscribe: unSubscribe };
+  return { readMsg: readMsg, unsubscribe: unsubscribe };
 };
 
 exports.publish = publish;

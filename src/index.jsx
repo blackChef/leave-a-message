@@ -18,14 +18,14 @@ let publish = function(channelName, msg) {
   Object.keys(channels[channelName]).forEach(function(subscriber) {
     let saveHistory = Array.isArray(channels[channelName][subscriber]);
     if (saveHistory) {
-      channels[channelName][subscriber].push(msg);
+      channels[channelName][subscriber].unshift(msg);
     } else {
       channels[channelName][subscriber] = msg;
     }
   });
 };
 
-let subscribe = function(channelName, opts) {
+let subscribe = function(channelName, opts = {}) {
   // If `saveHistory === false`, only the latest message would be kept,
   // otherwise, user can read an array of messages.
   let { saveHistory = false } = opts;
@@ -41,7 +41,7 @@ let subscribe = function(channelName, opts) {
   let readMsg = function() {
     if (!isSubscribed) {
       throw new Error(
-        `leave-a-message: You have already unSubscribed the channel "${channelName}".`
+        `leave-a-message: You have already unsubscribed the channel "${channelName}".`
       );
     }
 
@@ -50,12 +50,12 @@ let subscribe = function(channelName, opts) {
     return unreadMsg;
   };
 
-  let unSubscribe = function() {
+  let unsubscribe = function() {
     delete channels[channelName][subscriberId];
     isSubscribed = false;
   };
 
-  return { readMsg, unSubscribe };
+  return { readMsg, unsubscribe };
 };
 
 export { publish, subscribe };
