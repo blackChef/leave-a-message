@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var channels = {
   // channelName: {
-  //   subscriber: unreadMsg || undefined
+  //   subscriber: [undreadMsg] || unreadMsg || undefined
   // }
 };
 
@@ -27,26 +27,37 @@ var publish = function publish(channelName, msg) {
   }
 
   Object.keys(channels[channelName]).forEach(function (subscriber) {
-    channels[channelName][subscriber] = msg;
+    var saveHistory = Array.isArray(channels[channelName][subscriber]);
+    if (saveHistory) {
+      channels[channelName][subscriber].push(msg);
+    } else {
+      channels[channelName][subscriber] = msg;
+    }
   });
 };
 
-var subscribe = function subscribe(channelName) {
+var subscribe = function subscribe(channelName, opts) {
+  // If `saveHistory === false`, only the latest message would be kept,
+  // otherwise, user can read an array of messages.
+  var _opts$saveHistory = opts.saveHistory,
+      saveHistory = _opts$saveHistory === undefined ? false : _opts$saveHistory;
+
+
   if (channels[channelName] === undefined) {
     channels[channelName] = {};
   }
 
   var isSubscribed = true;
   var subscriberId = (0, _uniqueId2.default)();
-  channels[channelName][subscriberId] = undefined;
+  channels[channelName][subscriberId] = saveHistory ? [] : undefined;
 
   var readMsg = function readMsg() {
     if (!isSubscribed) {
-      throw new Error('You have already unSubscribed the channel "' + channelName + '".');
+      throw new Error('leave-a-message: You have already unSubscribed the channel "' + channelName + '".');
     }
 
     var unreadMsg = channels[channelName][subscriberId];
-    channels[channelName][subscriberId] = undefined;
+    channels[channelName][subscriberId] = saveHistory ? [] : undefined;
     return unreadMsg;
   };
 

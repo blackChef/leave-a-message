@@ -6,7 +6,7 @@ import uniqueId from 'lodash/uniqueId';
 
 let channels = {
   // channelName: {
-  //   subscriber: unreadMsg || undefined
+  //   subscriber: [undreadMsg] || unreadMsg || undefined
   // }
 };
 
@@ -16,28 +16,37 @@ let publish = function(channelName, msg) {
   }
 
   Object.keys(channels[channelName]).forEach(function(subscriber) {
-    channels[channelName][subscriber] = msg;
+    let saveHistory = Array.isArray(channels[channelName][subscriber]);
+    if (saveHistory) {
+      channels[channelName][subscriber].push(msg);
+    } else {
+      channels[channelName][subscriber] = msg;
+    }
   });
 };
 
-let subscribe = function(channelName) {
+let subscribe = function(channelName, opts) {
+  // If `saveHistory === false`, only the latest message would be kept,
+  // otherwise, user can read an array of messages.
+  let { saveHistory = false } = opts;
+
   if (channels[channelName] === undefined) {
     channels[channelName] = {};
   }
 
   let isSubscribed = true;
   let subscriberId = uniqueId();
-  channels[channelName][subscriberId] = undefined;
+  channels[channelName][subscriberId] = saveHistory ? [] : undefined;
 
   let readMsg = function() {
     if (!isSubscribed) {
       throw new Error(
-        `You have already unSubscribed the channel "${channelName}".`
+        `leave-a-message: You have already unSubscribed the channel "${channelName}".`
       );
     }
 
     let unreadMsg = channels[channelName][subscriberId];
-    channels[channelName][subscriberId] = undefined;
+    channels[channelName][subscriberId] = saveHistory ? [] : undefined;
     return unreadMsg;
   };
 
